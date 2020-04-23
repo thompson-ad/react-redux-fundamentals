@@ -1,0 +1,50 @@
+<body>
+  <div id="root"></div>
+  <script src="https://unpkg.com/react@16.12.0/umd/react.development.js"></script>
+  <script src="https://unpkg.com/react-dom@16.12.0/umd/react-dom.development.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/redux/4.0.5/redux.min.js"></script>
+  <script src="https://unpkg.com/@babel/standalone@7.8.3/babel.js"></script>
+  <script type="text/babel">
+    const { createStore } = Redux;
+
+    const counterReducer = (state = 0, action) => {
+      switch (action.type) {
+        case "INCREMENT":
+          return state + 1;
+        case "DECREMENT":
+          return state - 1;
+        default:
+          return state;
+      }
+    };
+    // The counter component does not contain any business logic
+    // It only specifies how the applications state transforms into an output
+    // The callbacks, passed via props are bound to the event handlers
+    const Counter = ({ value, onIncrement, onDecrement }) => (
+      <div>
+        <h1>{value}</h1>
+        <button onClick={onIncrement}>+</button>
+        <button onClick={onDecrement}>-</button>
+      </div>
+    );
+
+    const render = () => {
+      ReactDOM.render(
+        // When we render a counter we specify that's it's value should be taken from the redux stores current state
+        // When the user clicks, we dispatch the cooresponding action
+        // Our reducer specifies how the next state is calculated based on current state and action
+        <Counter
+          value={store.getState()}
+          onIncrement={() => store.dispatch({ type: "INCREMENT" })}
+          onDecrement={() => store.dispatch({ type: "DECREMENT" })}
+        />,
+        document.getElementById("root")
+      );
+    };
+
+    const store = createStore(counterReducer);
+    //subscribe to the reduc store so that the render function runs any time the state changes
+    store.subscribe(render);
+    render();
+  </script>
+</body>
