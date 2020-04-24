@@ -86,6 +86,10 @@
       </p>
     );
 
+    // todo takes onClick as a prop because it is considered a 'presentational' component
+    // That, way, anyone who uses ToDo component can specify what happens on the click
+    // It only has the information required to render, no behaviour
+    //
     const Todo = ({ onClick, completed, text }) => (
       <li
         onClick={onClick}
@@ -97,16 +101,23 @@
         {text}
       </li>
     );
-
+    // ToDo List is also a presentational component
+    //
     const TodoList = ({ todos, onTodoClick }) => (
       <ul>
         {todos.map((todo) => (
+          // renders a list of todos
+          // We could dispatch an action here but we still want this to be a presentation component
+          // We need a container component that passes the data from the store
           <Todo {...todo} key={todo.id} onClick={() => onTodoClick(todo.id)} />
         ))}
       </ul>
     );
 
     let nextTodoId = 0;
+    // This is out container component
+    // Think carefully about your container components
+    // You can have more than one and you need to be careful the top level component doesn't need to know too much.
     const TodoApp = ({ dispatch, todos, visibilityFilter }) => {
       let visibleTodos = todos;
 
@@ -120,6 +131,7 @@
       }
 
       return (
+        // container component
         <div>
           <AddTodo
             // The component is not aware how the state changes but it can express it's desire by dispatching an action
@@ -131,6 +143,7 @@
             todos={visibleTodos}
             // dispatch action
             // When an action is dispatched the store will call the root reducer
+            // This is where the behaviour is kept and the dispatch that updates the store
             onTodoClick={(id) => dispatch({ type: TOGGLE_TODO, id })}
           />
           <Footer
@@ -214,11 +227,15 @@
     // update the DOM in response to the current application state
     const render = () => {
       ReactDOM.render(
+        // all the keys from store.getState are passed from the store to the ToDoApp component as props
+        //
         <TodoApp {...store.getState()} dispatch={dispatch} />,
         document.getElementById("root")
       );
     };
     render();
+    // because the render function is subscribed to the store
+    //
     store.subscribe(render);
     console.log("current state:") || displayInPreview("current state:");
     console.log(store.getState()) ||
